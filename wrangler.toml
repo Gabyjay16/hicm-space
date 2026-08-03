@@ -6,7 +6,7 @@ pages_build_output_dir = "dist"
 [[d1_databases]]
 binding = "DB"
 database_name = "hicm-space-db"
-database_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+database_id = "23724224-ccf0-4114-9220-7f35f06d6fdd"
 
 [[r2_buckets]]
 binding = "STORAGE"
@@ -16,8 +16,3 @@ bucket_name = "hicm-space-storage"
 binding = "THESIS_QUEUE"
 queue = "hicm-space-thesis-queue"
 
-[[queues.consumers]]
-queue = "hicm-space-thesis-queue"
-max_batch_size = 1
-max_batch_timeout = 5
-max_retries = 3
