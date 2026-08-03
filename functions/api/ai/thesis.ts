@@ -44,7 +44,12 @@ export const onRequestPost: PagesFunction<{ OPENROUTER_API_KEY: string }> = asyn
 
     const content = data.choices[0].message.content;
     const jsonMatch = content.match(/\{[\s\S]*\}/);
-    const rawJson = jsonMatch ? jsonMatch[0] : content;
+    
+    if (!jsonMatch) {
+      return Response.json({ error: 'AI failed to return valid JSON format', rawOutput: content }, { status: 502 });
+    }
+
+    const rawJson = jsonMatch[0];
     
     return new Response(rawJson, {
       headers: { 'Content-Type': 'application/json' }

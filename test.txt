@@ -1,0 +1,1 @@
+This is a mock thesis abstract for testing the AI Thesis Checker. The research examines the impact of quantum computing on modern cryptography. While quantum computers pose a significant threat to RSA encryption, post-quantum cryptographic algorithms like lattice-based cryptography offer a promising alternative for securing digital communications.

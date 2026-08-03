@@ -24,8 +24,12 @@ const ThesisChecker = () => {
       // For now, we simulate sending the file to our AI endpoints by reading the file 
       // or passing a mock abstract if file parsing isn't available
       
-      const formData = new FormData();
-      formData.append('file', file);
+      let textToSend = "Sample thesis content.";
+      if (file && file.name.endsWith('.txt')) {
+        textToSend = await file.text();
+      } else if (file) {
+        textToSend = `[Simulated text from ${file.name}] The research examines the impact of quantum computing on modern cryptography. While quantum computers pose a significant threat to RSA encryption, post-quantum cryptographic algorithms like lattice-based cryptography offer a promising alternative for securing digital communications.`;
+      }
       
       const res = await fetch('/api/ai/thesis', {
         method: 'POST',
@@ -33,15 +37,24 @@ const ThesisChecker = () => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          text: "Mock abstract text of the thesis goes here..."
+          text: textToSend
         })
       });
 
       if (res.ok) {
-        const data = await res.json();
-        setResult(data);
+        try {
+          const data = await res.json();
+          setResult(data);
+        } catch (jsonError) {
+          alert("AI returned an invalid format. Please try again.");
+        }
       } else {
-        alert('Failed to analyze document. Please try again.');
+        try {
+          const errorData = await res.json();
+          alert(errorData.error || 'Failed to analyze document.');
+        } catch {
+          alert('Failed to analyze document. Please try again.');
+        }
       }
     } catch (e: any) {
       alert(e.message || 'Network error');
