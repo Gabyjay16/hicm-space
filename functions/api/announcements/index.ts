@@ -1,4 +1,4 @@
-import { Env } from '../../../env';
+import { Env } from '../../env';
 import { parse } from 'cookie';
 
 // GET /api/announcements - fetch all published announcements
