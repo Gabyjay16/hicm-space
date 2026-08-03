@@ -239,7 +239,7 @@ const ComplaintsDesk = () => {
             disabled={isSubmitting}
             className="w-full bg-slate-900 hover:bg-slate-800 text-white font-medium py-3 rounded-xl transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
           >
-            {isSubmitting ? <><Loader2 size={18} className="animate-spin" /> Submitting...</> : 'Submit Ticket'}
+            {isSubmitting ? <><Loader2 size={18} className="animate-spin" /> Submitting...</> : 'Submit Complaint'}
           </button>
         </form>
       </div>

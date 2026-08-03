@@ -15,7 +15,6 @@ interface AuthContextType {
   user: User | null;
   login: (userData: User) => void;
   logout: () => void;
-  toggleMockRole: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -48,12 +47,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
   };
 
-  const toggleMockRole = () => {
-    // Removed for production use
-  };
-
   return (
-    <AuthContext.Provider value={{ user, login, logout, toggleMockRole }}>
+    <AuthContext.Provider value={{ user, login, logout }}>
       {!loading && children}
     </AuthContext.Provider>
   );

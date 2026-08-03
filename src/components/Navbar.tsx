@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { BookOpen, ChevronDown, GraduationCap, Users, LifeBuoy, ToggleLeft, ToggleRight, LogOut } from 'lucide-react';
+import { BookOpen, ChevronDown, GraduationCap, Users, LifeBuoy, LogOut } from 'lucide-react';
 import AuthModal from './AuthModal';
 
 const Navbar = () => {
-  const { user, logout, toggleMockRole } = useAuth();
+  const { user, logout } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -100,15 +100,7 @@ const Navbar = () => {
                 </button>
               ) : (
                 <div className="flex items-center gap-4">
-                  {/* Role Toggle for Testing */}
-                  <button 
-                    onClick={toggleMockRole}
-                    className="flex items-center gap-1 text-xs font-medium text-slate-500 bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded-full transition-colors"
-                    title="Toggle Role (Student <-> Staff)"
-                  >
-                    {user.role === 'student' ? <ToggleLeft size={16} className="text-indigo-500" /> : <ToggleRight size={16} className="text-emerald-500" />}
-                    <span>{user.role === 'student' ? 'Student View' : 'Staff View'}</span>
-                  </button>
+
 
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold">
