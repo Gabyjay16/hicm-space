@@ -1,6 +1,12 @@
 import { Env } from '../../env';
-import bcrypt from 'bcryptjs';
-import { parse, serialize } from 'cookie';
+import { serialize } from 'cookie';
+
+async function hashPassword(password: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { request, env } = context;
@@ -21,7 +27,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       return Response.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
-    const isValid = bcrypt.compareSync(password, user.password_hash);
+    const inputHash = await hashPassword(password);
+    const isValid = (inputHash === user.password_hash);
     if (!isValid) {
       return Response.json({ error: 'Invalid credentials' }, { status: 401 });
     }

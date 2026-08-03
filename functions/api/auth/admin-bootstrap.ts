@@ -1,5 +1,11 @@
 import { Env } from '../../env';
-import bcrypt from 'bcryptjs';
+
+async function hashPassword(password: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(password);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   const { request, env } = context;
@@ -19,7 +25,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       return Response.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const hash = bcrypt.hashSync(password, 8);
+    const hash = await hashPassword(password);
     const userId = crypto.randomUUID();
 
     await env.DB.prepare(
