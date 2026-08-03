@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 type Role = 'student' | 'staff' | 'admin' | null;
 
 interface User {
+  id?: string;
   name: string;
   role: Role;
   matricule?: string; // Student only

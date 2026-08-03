@@ -1,125 +1,138 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useDatabase } from '../context/DatabaseContext';
-import { Hash, Send } from 'lucide-react';
+import { MessageSquare, Send, Search, Filter } from 'lucide-react';
 
-const CHANNELS = ['General', 'Level-200', 'Level-300', 'Level-400'];
+interface ForumPost {
+  id: string;
+  user_id: string;
+  author_name: string;
+  author_role: string;
+  content: string;
+  created_at: string;
+}
 
 const ChatForums = () => {
   const { user } = useAuth();
-  const { messages, addMessage } = useDatabase();
-  const [activeChannel, setActiveChannel] = useState(CHANNELS[0]);
-  const [inputValue, setInputValue] = useState('');
   
+  const [posts, setPosts] = useState<ForumPost[]>([]);
+  const [newPost, setNewPost] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const channelMessages = messages.filter(m => m.channel === activeChannel);
-
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [channelMessages]);
+    if (user) fetchPosts();
+  }, [user]);
 
-  const handleSend = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inputValue.trim() || !user) return;
-    
-    addMessage({
-      channel: activeChannel,
-      senderName: user.name,
-      content: inputValue
-    });
-    setInputValue('');
+  const fetchPosts = async () => {
+    try {
+      const res = await fetch('/api/forums');
+      if (res.ok) {
+        const data = await res.json();
+        // Backend returns DESC, let's reverse to show oldest at top for chat view
+        setPosts(data.reverse());
+        setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
+      }
+    } catch (e) {
+      console.error(e);
+    }
   };
 
-  if (!user) return <div className="text-center py-20 text-slate-500">Please login to access chat forums.</div>;
+  const handlePost = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPost.trim() || !user) return;
+    setIsSubmitting(true);
+    
+    try {
+      const res = await fetch('/api/forums', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userId: user.id || user.matricule,
+          authorName: user.name,
+          authorRole: user.role,
+          content: newPost
+        })
+      });
+
+      if (res.ok) {
+        setNewPost('');
+        fetchPosts();
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (!user) return <div className="text-center py-20 text-slate-500">Please login to access forums.</div>;
 
   return (
-    <div className="max-w-6xl mx-auto h-[80vh] min-h-[600px] flex bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-      
-      {/* Sidebar */}
-      <div className="w-64 bg-slate-50 border-r border-slate-200 flex flex-col">
-        <div className="p-6 border-b border-slate-200">
-          <h2 className="text-lg font-bold text-slate-900">Forums</h2>
-        </div>
-        <div className="flex-1 overflow-y-auto p-4 space-y-1">
-          {CHANNELS.map(ch => (
-            <button
-              key={ch}
-              onClick={() => setActiveChannel(ch)}
-              className={`w-full flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
-                activeChannel === ch 
-                  ? 'bg-indigo-100 text-indigo-700' 
-                  : 'text-slate-600 hover:bg-slate-200 hover:text-slate-900'
-              }`}
-            >
-              <Hash size={16} className={activeChannel === ch ? 'text-indigo-500' : 'text-slate-400'} />
-              {ch}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col bg-white">
-        
-        {/* Header */}
-        <div className="h-20 border-b border-slate-100 flex items-center px-8">
-          <div className="flex items-center gap-2 text-xl font-bold text-slate-900">
-            <Hash className="text-slate-400" />
-            {activeChannel}
+    <div className="max-w-4xl mx-auto h-[85vh] flex flex-col bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      {/* Header */}
+      <div className="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-indigo-100 text-indigo-600 rounded-lg">
+            <MessageSquare size={20} />
+          </div>
+          <div>
+            <h1 className="font-bold text-slate-900">General Discussion</h1>
+            <p className="text-xs text-slate-500">Connect with students and staff</p>
           </div>
         </div>
-
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-8 space-y-6">
-          {channelMessages.length === 0 ? (
-            <div className="h-full flex items-center justify-center text-slate-400 text-sm">
-              No messages here yet. Break the ice!
-            </div>
-          ) : (
-            channelMessages.map(msg => {
-              const isMe = msg.senderName === user.name;
-              return (
-                <div key={msg.id} className={`flex flex-col max-w-[75%] ${isMe ? 'ml-auto items-end' : 'mr-auto items-start'}`}>
-                  <div className="flex items-baseline gap-2 mb-1 px-1">
-                    <span className="text-sm font-bold text-slate-700">{msg.senderName}</span>
-                    <span className="text-[10px] text-slate-400">{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                  </div>
-                  <div className={`px-5 py-3 rounded-2xl text-[15px] shadow-sm ${
-                    isMe 
-                      ? 'bg-indigo-600 text-white rounded-tr-sm' 
-                      : 'bg-slate-100 text-slate-800 rounded-tl-sm'
-                  }`}>
-                    {msg.content}
-                  </div>
-                </div>
-              );
-            })
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Input */}
-        <div className="p-6 border-t border-slate-100">
-          <form onSubmit={handleSend} className="relative flex items-center">
-            <input 
-              type="text" 
-              value={inputValue}
-              onChange={e => setInputValue(e.target.value)}
-              placeholder={`Message #${activeChannel}`}
-              className="w-full bg-slate-50 border border-slate-200 rounded-full pl-6 pr-14 py-4 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all shadow-sm"
-            />
-            <button 
-              type="submit"
-              disabled={!inputValue.trim()}
-              className="absolute right-2 w-10 h-10 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 disabled:text-slate-500 text-white rounded-full flex items-center justify-center transition-colors"
-            >
-              <Send size={18} className="ml-0.5" />
-            </button>
-          </form>
+        <div className="flex gap-2 text-slate-400">
+          <button className="p-2 hover:bg-slate-200 rounded-lg transition-colors"><Search size={18} /></button>
+          <button className="p-2 hover:bg-slate-200 rounded-lg transition-colors"><Filter size={18} /></button>
         </div>
       </div>
 
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/50">
+        {posts.map(post => {
+          const isMe = post.user_id === (user.id || user.matricule);
+          const isStaff = post.author_role === 'staff' || post.author_role === 'admin';
+          
+          return (
+            <div key={post.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+              <div className="flex items-baseline gap-2 mb-1 mx-1">
+                <span className="text-xs font-semibold text-slate-700">{isMe ? 'You' : post.author_name}</span>
+                {isStaff && !isMe && (
+                  <span className="text-[10px] uppercase font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded">Staff</span>
+                )}
+                <span className="text-[10px] text-slate-400">{new Date(post.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+              </div>
+              <div className={`px-4 py-3 rounded-2xl max-w-[80%] shadow-sm ${
+                isMe ? 'bg-indigo-600 text-white rounded-tr-sm' : 'bg-white border border-slate-200 text-slate-700 rounded-tl-sm'
+              }`}>
+                {post.content}
+              </div>
+            </div>
+          );
+        })}
+        <div ref={messagesEndRef} />
+      </div>
+
+      {/* Input */}
+      <div className="p-4 bg-white border-t border-slate-200">
+        <form onSubmit={handlePost} className="flex gap-2">
+          <input 
+            type="text"
+            value={newPost}
+            onChange={e => setNewPost(e.target.value)}
+            placeholder="Type your message..."
+            className="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-colors"
+          />
+          <button 
+            type="submit"
+            disabled={!newPost.trim() || isSubmitting}
+            className="p-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition-colors disabled:opacity-50 flex items-center justify-center"
+          >
+            <Send size={20} />
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
