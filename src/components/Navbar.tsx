@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { BookOpen, ChevronDown, GraduationCap, Users, LifeBuoy, LogOut } from 'lucide-react';
+import { BookOpen, ChevronDown, GraduationCap, Users, LifeBuoy, LogOut, Menu, X } from 'lucide-react';
 import AuthModal from './AuthModal';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const toggleDropdown = (name: string) => {
     if (activeDropdown === name) setActiveDropdown(null);
@@ -117,8 +117,46 @@ const Navbar = () => {
                 </div>
               )}
             </div>
+
+            {/* Mobile menu button */}
+            <div className="flex items-center md:hidden ml-2">
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="text-slate-500 hover:text-indigo-600 p-2"
+              >
+                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
           </div>
         </div>
+
+        {/* Mobile Navigation */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden border-t border-slate-200 bg-white">
+            <div className="px-2 pt-2 pb-3 space-y-1">
+              {navLinks.map((link) => (
+                <div key={link.name} className="block">
+                  <div className="px-3 py-2 text-base font-semibold text-slate-800 flex items-center">
+                    {link.icon}
+                    {link.name}
+                  </div>
+                  <div className="pl-6 pb-2 space-y-1">
+                    {link.items.map(item => (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="block px-3 py-2 text-sm text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 rounded-md"
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </nav>
 
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
