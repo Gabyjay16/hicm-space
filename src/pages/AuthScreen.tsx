@@ -71,8 +71,12 @@ const AuthScreen = () => {
     setLoading(true);
     setError('');
 
-    // If staff, map Name to Matricule for backend consistency
-    const finalMatricule = isStaffReg ? regName : regMatricule;
+    // If staff, we don't map Name to Matricule. We just use the matricule they provided or generate one?
+    // Wait, the user typed the staff code in the Matricule field to trigger this mode.
+    // They don't have a real matricule. Let's use the staff code as their matricule, or let them pick one.
+    // The instructions say "Entering a valid code in the Matricule field on the registration page should securely open Staff Registration without displaying a staff hint."
+    // So the staff code IS the matricule they typed.
+    const finalMatricule = regMatricule;
     
     try {
       const res = await fetch('/api/auth/register', {
