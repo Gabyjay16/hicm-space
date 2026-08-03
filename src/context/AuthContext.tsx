@@ -20,37 +20,40 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(() => {
-    const saved = localStorage.getItem('hicm_auth_user');
-    return saved ? JSON.parse(saved) : null;
-  });
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user) {
-      localStorage.setItem('hicm_auth_user', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('hicm_auth_user');
-    }
-  }, [user]);
+    // Check session on mount
+    fetch('/api/auth/me')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.user) {
+          setUser(data.user);
+        }
+      })
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
 
   const login = (userData: User) => setUser(userData);
-  const logout = () => setUser(null);
+  
+  const logout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (e) {
+      console.error(e);
+    }
+    setUser(null);
+  };
 
   const toggleMockRole = () => {
-    if (!user) return;
-    setUser((prev) => {
-      if (!prev) return prev;
-      if (prev.role === 'student') {
-        return { ...prev, role: 'staff', position: 'Lecturer', matricule: undefined };
-      } else {
-        return { ...prev, role: 'student', matricule: 'HICM1234', position: undefined };
-      }
-    });
+    // Removed for production use
   };
 
   return (
     <AuthContext.Provider value={{ user, login, logout, toggleMockRole }}>
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   );
 };

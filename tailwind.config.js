@@ -7,14 +7,20 @@ export default {
   theme: {
     extend: {
       colors: {
+        background: '#fcfcfc', // off-white background
+        foreground: '#0f172a', // deep navy text
         primary: {
-          50: '#eef2ff',
-          100: '#e0e7ff',
-          500: '#6366f1',
-          600: '#4f46e5',
-          700: '#4338ca',
-          900: '#312e81',
-        }
+          DEFAULT: '#0f172a', // deep navy
+          light: '#1e293b'
+        },
+        accent: {
+          DEFAULT: '#0d9488', // muted teal
+          light: '#14b8a6'
+        },
+        border: '#e2e8f0', // thin separators
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'], // compact academic typography
       }
     },
   },
