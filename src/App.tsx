@@ -7,7 +7,7 @@ import Navbar from './components/Navbar';
 
 // Pages
 import Home from './pages/Home';
-import QuizGenerator from './pages/QuizGenerator';
+import NotesAndMCQs from './pages/NotesAndMCQs';
 import ThesisChecker from './pages/ThesisChecker';
 import ComplaintsDesk from './pages/ComplaintsDesk';
 import Announcements from './pages/Announcements';
@@ -32,7 +32,7 @@ const MainApp = () => {
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/academics/quiz" element={<QuizGenerator />} />
+          <Route path="/academics/quiz" element={<NotesAndMCQs />} />
           <Route path="/academics/thesis" element={<ThesisChecker />} />
           <Route path="/services/complaints" element={<ComplaintsDesk />} />
           <Route path="/campus/announcements" element={<Announcements />} />
