@@ -24,7 +24,7 @@ export const generateQuiz = async (contextText: string, numQuestions: number = 5
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: "google/gemma-2-9b-it:free", // Use a free model since the provided key might not have credits
+        model: "google/gemma-4-26b-a4b-it:free", // Use a free model since the provided key might not have credits
         messages: [{ role: 'user', content: prompt }]
       })
     });
@@ -76,7 +76,7 @@ export const analyzeThesis = async (thesisText: string) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: "google/gemma-2-9b-it:free",
+        model: "google/gemma-4-26b-a4b-it:free",
         messages: [{ role: 'user', content: prompt }]
       })
     });
