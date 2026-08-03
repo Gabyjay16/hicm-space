@@ -53,8 +53,9 @@ const ThesisChecker = () => {
     try {
       const result = await analyzeThesis("Mock abstract text of the thesis goes here...");
       setAnalysisResult(result);
-    } catch (e) {
-      alert("Analysis failed.");
+    } catch (error: any) {
+      console.error(error);
+      alert(`Error analyzing thesis: ${error.message || 'Check API connection.'}`);
     } finally {
       setIsAnalyzing(false);
     }

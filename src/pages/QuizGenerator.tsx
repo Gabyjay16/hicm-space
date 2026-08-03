@@ -63,9 +63,9 @@ const QuizGenerator = () => {
       } else {
         alert("Failed to parse AI response. Please try again.");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert('Error generating quiz. Check API key or connection.');
+      alert(`Error generating quiz: ${error.message || 'Check API key or connection.'}`);
     } finally {
       setIsGenerating(false);
     }

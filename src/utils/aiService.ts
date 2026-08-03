@@ -24,16 +24,21 @@ export const generateQuiz = async (contextText: string, numQuestions: number = 5
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: "openai/gpt-3.5-turbo", // You can switch this to a free model if needed like google/gemini-pro
+        model: "google/gemma-2-9b-it:free", // Use a free model since the provided key might not have credits
         messages: [{ role: 'user', content: prompt }]
       })
     });
 
+    const data = await response.json();
+    
+    if (data.error) {
+      throw new Error(data.error.message || 'API returned an error');
+    }
+    
     if (!response.ok) {
       throw new Error('Failed to generate quiz');
     }
 
-    const data = await response.json();
     const content = data.choices[0].message.content;
     
     // Attempt to extract JSON if it was wrapped in markdown
@@ -41,9 +46,9 @@ export const generateQuiz = async (contextText: string, numQuestions: number = 5
     const rawJson = jsonMatch ? jsonMatch[0] : content;
     
     return JSON.parse(rawJson);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error generating quiz:", error);
-    return null;
+    throw error; // Re-throw to handle in the component
   }
 };
 
@@ -71,24 +76,29 @@ export const analyzeThesis = async (thesisText: string) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: "openai/gpt-3.5-turbo",
+        model: "google/gemma-2-9b-it:free",
         messages: [{ role: 'user', content: prompt }]
       })
     });
+
+    const data = await response.json();
+    
+    if (data.error) {
+      throw new Error(data.error.message || 'API returned an error');
+    }
 
     if (!response.ok) {
       throw new Error('Failed to analyze thesis');
     }
 
-    const data = await response.json();
     const content = data.choices[0].message.content;
     
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     const rawJson = jsonMatch ? jsonMatch[0] : content;
     
     return JSON.parse(rawJson);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error analyzing thesis:", error);
-    return null;
+    throw error; // Re-throw to handle in the component
   }
 };
