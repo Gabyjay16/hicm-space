@@ -27,34 +27,34 @@ const MainApp = () => {
   }
 
   return (
-    <Router>
-      <div className="min-h-screen flex flex-col bg-background text-foreground font-sans">
-        <Navbar />
-        <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/academics/quiz" element={<QuizGenerator />} />
-            <Route path="/academics/thesis" element={<ThesisChecker />} />
-            <Route path="/services/complaints" element={<ComplaintsDesk />} />
-            <Route path="/campus/announcements" element={<Announcements />} />
-            <Route path="/campus/voting" element={<Voting />} />
-            <Route path="/campus/lost-and-found" element={<LostAndFound />} />
-            <Route path="/campus/forums" element={<ChatForums />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-          </Routes>
-        </main>
-      </div>
-    </Router>
+    <div className="min-h-screen flex flex-col bg-background text-foreground font-sans">
+      <Navbar />
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/academics/quiz" element={<QuizGenerator />} />
+          <Route path="/academics/thesis" element={<ThesisChecker />} />
+          <Route path="/services/complaints" element={<ComplaintsDesk />} />
+          <Route path="/campus/announcements" element={<Announcements />} />
+          <Route path="/campus/voting" element={<Voting />} />
+          <Route path="/campus/lost-and-found" element={<LostAndFound />} />
+          <Route path="/campus/forums" element={<ChatForums />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+        </Routes>
+      </main>
+    </div>
   );
 };
 
 function App() {
   return (
-    <AuthProvider>
-      <DatabaseProvider>
-        <MainApp />
-      </DatabaseProvider>
-    </AuthProvider>
+    <Router>
+      <AuthProvider>
+        <DatabaseProvider>
+          <MainApp />
+        </DatabaseProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 
